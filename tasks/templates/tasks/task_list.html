@@ -1,0 +1,90 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>My Tasks</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'create_task' %}" class="btn btn-success">+ Add New Task</a>
+    </div>
+</div>
+
+<!-- Search & Filter Form -->
+<form method="get" class="row g-3 mb-4 bg-white p-3 rounded shadow-sm">
+    <div class="col-md-3">
+        <input type="text" name="search" class="form-control" placeholder="Search tasks..." value="{{ request.GET.search }}">
+    </div>
+    <div class="col-md-2">
+        <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="In Progress" {% if request.GET.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+            <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="priority" class="form-select">
+            <option value="">All Priority</option>
+            <option value="High" {% if request.GET.priority == 'High' %}selected{% endif %}>High</option>
+            <option value="Medium" {% if request.GET.priority == 'Medium' %}selected{% endif %}>Medium</option>
+            <option value="Low" {% if request.GET.priority == 'Low' %}selected{% endif %}>Low</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="sort" class="form-select">
+            <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Oldest</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+<!-- Task Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th> 
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ task.id }}</td> 
+                    
+                    <td><a href="{% url 'task_detail' task.id %}" class="text-decoration-none fw-bold">{{ task.title }}</a></td>
+                    <td>
+                        <span class="badge bg-{% if task.status == 'Completed' %}success{% elif task.status == 'In Progress' %}warning{% else %}secondary{% endif %}">
+                            {{ task.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if task.priority == 'High' %}danger{% elif task.priority == 'Medium' %}info{% else %}light text-dark{% endif %}">
+                            {{ task.priority }}
+                        </span>
+                    </td>
+                    <td>{{ task.due_date }}</td>
+                    <td>
+                        <a href="{% url 'update_task' task.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">No tasks found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
